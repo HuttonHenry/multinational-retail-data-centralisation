@@ -9,7 +9,7 @@ class DatabaseConnector:
 
     def init_db_engine(self):
         creds = self.read_db_creds()
-        conn_string = (f"{creds['RDS_DBTYPE']}://{creds['RDS_USER']}:{creds['RDS_PASSWORD']}@{creds['RDS_HOST']}:{creds['RDS_PORT']/}/{creds['RDS_DATABASE']}"
+        conn_string = (f"{creds['RDS_DBTYPE']}://{creds['RDS_USER']}:{creds['RDS_PASSWORD']}@{creds['RDS_HOST']}:{creds['RDS_PORT']}/{creds['RDS_DATABASE']}")
         print(conn_string)
         print("Conencting to the ENGINE dude!")
         try:
@@ -20,5 +20,18 @@ class DatabaseConnector:
             print("Connected, no probs dudes.")
         return self.engine
 
+    def list_db_tables(self,dbengine):
+        inspector = dbengine(self.engine)
+        return inspector.get_table_names()
+        
+    def read_data_from_db(self, table_name):
+        connection = self.engine.connect()
+        query = f"SELECT * FROM {table_name}"
+        result = connection.execute(query).fetchall()
+        connection.close()
+        return result
+
+
 db = DatabaseConnector()
 engine = db.init_db_engine()
+tables = db.list_db_tables(engine)
