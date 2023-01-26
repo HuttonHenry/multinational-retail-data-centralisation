@@ -1,5 +1,6 @@
 import yaml
 from sqlalchemy import create_engine
+from sqlalchemy import inspect
 
 class DatabaseConnector:
     def read_db_creds(self):
@@ -21,8 +22,9 @@ class DatabaseConnector:
         return self.engine
 
     def list_db_tables(self,dbengine):
-        inspector = dbengine(self.engine)
-        return inspector.get_table_names()
+        inspector = inspect(dbengine)
+        for table_name in inspector.get_table_names():
+            print(table_name)
         
     def read_data_from_db(self, table_name):
         connection = self.engine.connect()
