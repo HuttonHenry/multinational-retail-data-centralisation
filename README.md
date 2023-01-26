@@ -19,3 +19,5 @@ I also had to install <conda install psycopg2>
 https://anaconda.org/anaconda/psycopg2
 
 
+PANDAS
+Had to install <conda install pandas>

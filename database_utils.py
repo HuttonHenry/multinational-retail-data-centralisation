@@ -1,6 +1,8 @@
 import yaml
 from sqlalchemy import create_engine
 from sqlalchemy import inspect
+import pandas
+import data_cleaning as dc
 
 class DatabaseConnector:
     def read_db_creds(self):
@@ -30,10 +32,14 @@ class DatabaseConnector:
         connection = self.engine.connect()
         query = f"SELECT * FROM {table_name}"
         result = connection.execute(query).fetchall()
+        print("Adding table to pandas dataframe")
+        mypanda = pandas.DataFrame(result)
         connection.close()
-        return result
+        return mypanda
 
 
 db = DatabaseConnector()
 engine = db.init_db_engine()
 tables = db.list_db_tables(engine)
+pandaDF = db.read_data_from_db("legacy_users")
+cleandata = dc.clean_user_data(pandaDF)
