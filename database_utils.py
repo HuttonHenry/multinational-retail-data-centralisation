@@ -4,7 +4,20 @@ from sqlalchemy import inspect
 import pandas
 import data_cleaning as dc
 
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 class DatabaseConnector:
+
     def read_db_creds(self):
         with open('db_creds.yaml','r') as f:
             self.creds = yaml.safe_load(f)
@@ -14,13 +27,13 @@ class DatabaseConnector:
         creds = self.read_db_creds()
         conn_string = (f"{creds['RDS_DBTYPE']}://{creds['RDS_USER']}:{creds['RDS_PASSWORD']}@{creds['RDS_HOST']}:{creds['RDS_PORT']}/{creds['RDS_DATABASE']}")
         print(conn_string)
-        print("Conencting to the ENGINE dude!")
+        print(f"{bcolors.OKBLUE}Conencting to the ENGINE dude!")
         try:
             self.engine = create_engine(conn_string)
         except:
-            print("Issue connecting to the database dudes.")
+            print(f"{bcolors.FAIL}Issue connecting to the database dudes.")
         else:
-            print("Connected, no probs dudes.")
+            print(f"{bcolors.OKGREEN}Connected, no probs dudes.")
         return self.engine
 
     def list_db_tables(self,dbengine):
@@ -32,14 +45,23 @@ class DatabaseConnector:
         connection = self.engine.connect()
         query = f"SELECT * FROM {table_name}"
         result = connection.execute(query).fetchall()
-        print("Adding table to pandas dataframe")
-        mypanda = pandas.DataFrame(result)
+        print(f"{bcolors.OKCYAN}Adding table to pandas dataframe")
+        try:
+            mypanda = pandas.DataFrame(result)
+        except:
+            print(f"{bcolors.FAIL}Adding data to panda Dataframe failed.")
         connection.close()
         return mypanda
 
 
+#Connect to the Postgres database in AWS
 db = DatabaseConnector()
 engine = db.init_db_engine()
+#List the tables
 tables = db.list_db_tables(engine)
+#Copy the data from the table into a Pandas DF
 pandaDF = db.read_data_from_db("legacy_users")
-cleandata = dc.clean_user_data(pandaDF)
+print(pandaDF)
+# Clean the data.
+dcc = dc.DataCleaning()
+cleandata = dcc.clean_user_data(pandaDF)
