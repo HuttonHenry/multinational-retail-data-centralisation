@@ -1,13 +1,17 @@
 class DataCleaning:
         
-        def clean_user_data(self,data):
-            # Perform data cleaning here
+        def __init__(self):
+            print("in datacleaner init")
+
+        def clean_user_data(self,data):            
             # Check for NULL values and replace with appropriate values
-            self.data.fillna(value='', inplace=True)
+            data.fillna(value='', inplace=True)
             # Check for errors in date values and correct them
-            self.data['date_column'] = self.data.to_datetime(self.data['date_column'], errors='coerce')
+            data['date_of_birth'] = data.
+
+            data['date_of_birth'] = data.to_datetime(data['date_of_birth'], errors='coerce')
             # Check for incorrectly typed values and correct them
-            self.data['column_name'] =self.data['column_name'].astype(str)
+            data['column_name'] =data['column_name'].astype(str)
             # Check for rows filled with wrong information and drop them
-            self.data = self.data[self.data['column_name'] != 'invalid_value']
-            return self.data
+            data = data[data['column_name'] != 'invalid_value']
+            return data
