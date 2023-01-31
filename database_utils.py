@@ -53,6 +53,16 @@ class DatabaseConnector:
         connection.close()
         return mypanda
 
+    def upload_to_db(self, dataframe, table_name):
+        try:
+            conn = self.engine.connect()
+            dataframe.to_sql(table_name, conn, if_exists='replace')
+            print("Data uploaded successfully to the table:", table_name)
+        except Exception as e:
+                print("Error while uploading data to the database:", e)
+        finally:
+                conn.close()
+
 
 #Connect to the Postgres database in AWS
 db = DatabaseConnector()
@@ -61,7 +71,10 @@ engine = db.init_db_engine()
 tables = db.list_db_tables(engine)
 #Copy the data from the table into a Pandas DF
 pandaDF = db.read_data_from_db("legacy_users")
-print(pandaDF)
+for col in pandaDF.columns:
+    print(col)
 # Clean the data.
+print(f"{bcolors.OKGREEN}Ckeaning the data dude!")
 dcc = dc.DataCleaning()
 cleandata = dcc.clean_user_data(pandaDF)
+success = db.upload_to_db(cleandata,"Sales_Data")

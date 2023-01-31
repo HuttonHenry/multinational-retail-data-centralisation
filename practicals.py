@@ -62,7 +62,7 @@ print_clothing_attributes(clothing, ['color', 'size'])
 def create_profile(name, age, email):
     if not check_name(name) or not check_email(email) or not check_age(age):
         print("nothing entered!")
-        return
+        return9.90
     # create the profile here
     
 def check_name(name):
