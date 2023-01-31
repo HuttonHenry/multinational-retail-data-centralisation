@@ -55,11 +55,12 @@ class DatabaseConnector:
 
     def upload_to_db(self, dataframe, table_name):
         try:
+            self.engine = create_engine("postgresql://postgres:Misty123@localhost:5432/Sales_Data")
             conn = self.engine.connect()
             dataframe.to_sql(table_name, conn, if_exists='replace')
             print("Data uploaded successfully to the table:", table_name)
         except Exception as e:
-                print("Error while uploading data to the database:", e)
+                print(f"{bcolors.FAIL}Error while uploading data to the database:", e)
         finally:
                 conn.close()
 
@@ -74,7 +75,8 @@ pandaDF = db.read_data_from_db("legacy_users")
 for col in pandaDF.columns:
     print(col)
 # Clean the data.
-print(f"{bcolors.OKGREEN}Ckeaning the data dude!")
+print(f"{bcolors.OKGREEN}Cleaning the data dude!")
 dcc = dc.DataCleaning()
 cleandata = dcc.clean_user_data(pandaDF)
-success = db.upload_to_db(cleandata,"Sales_Data")
+print(f"{bcolors.OKGREEN}Uploading the data dude!")
+success = db.upload_to_db(cleandata,"dim_users")
