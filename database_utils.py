@@ -3,6 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy import inspect
 import pandas
 import data_cleaning as dc
+import data_extraction as de
 
 
 class bcolors:
@@ -80,3 +81,10 @@ dcc = dc.DataCleaning()
 cleandata = dcc.clean_user_data(pandaDF)
 print(f"{bcolors.OKGREEN}Uploading the data dude!")
 success = db.upload_to_db(cleandata,"dim_users")
+
+print(f"{bcolors.OKGREEN}Reading a PDF to Dataframe!")
+PDFdf = de.DataExtractor().retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
+
+print(f"{bcolors.OKGREEN}Cleaning PDF dataframe.")
+results = dc.DataCleaning().clean_card_data(PDFdf)
+print(results)
