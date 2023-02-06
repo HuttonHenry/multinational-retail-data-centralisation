@@ -86,5 +86,11 @@ print(f"{bcolors.OKGREEN}Reading a PDF to Dataframe!")
 PDFdf = de.DataExtractor().retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
 
 print(f"{bcolors.OKGREEN}Cleaning PDF dataframe.")
-results = dc.DataCleaning().clean_card_data(PDFdf)
-print(results)
+cleanCCdata = dc.DataCleaning().clean_card_data(PDFdf)
+print(cleanCCdata)
+
+print(f"{bcolors.OKGREEN}Uploading credit card data!")
+success = db.upload_to_db(cleanCCdata,"dim_card_details")
+
+numberstores = de.DataExtractor.list_number_of_stores()
+print(numberstores)
