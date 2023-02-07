@@ -23,3 +23,17 @@ class DataExtractor:
             return response.json()
         else:
             return None
+
+    def retrieve_stores_data(number_stores,retrieve_store_endpoint, header):
+        stores_data = []
+        for i in range(number_stores):
+            store_url = retrieve_store_endpoint+str(i)
+            try:
+                response = requests.get(store_url, headers=header)
+            except:
+                print("there was an error!")    
+            stores_data.append(response.json())
+            if i % 10 == 0:
+                print(f"Collected record {i}")
+            df = pd.DataFrame(stores_data)
+        return df

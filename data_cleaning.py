@@ -36,3 +36,9 @@ class DataCleaning:
             elif length > 16:
                 cleaned_number = cleaned_number[:16]
             return cleaned_number
+        
+        def clean_store_data(self,df):
+                # path to PDF file
+                df.fillna(value='', inplace=True)
+                # here we return the dataframe and do not return any null fields
+                return df.dropna(how='any')

@@ -93,4 +93,19 @@ print(f"{bcolors.OKGREEN}Uploading credit card data!")
 success = db.upload_to_db(cleanCCdata,"dim_card_details")
 
 numberstores = de.DataExtractor.list_number_of_stores()
-print(numberstores)
+number_of_stores = numberstores.get('number_stores')
+
+headers = {
+            "x-api-key": "yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX"
+        }
+
+#Get the data from the API
+print(f"Collecting data from {number_of_stores} stores.")
+
+#Extra data from the API
+APIdf = de.DataExtractor.retrieve_stores_data(number_of_stores,"https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details/",headers)
+#Clean the dataframe
+cleanAPIdata = dc.DataCleaning().clean_store_data(APIdf)
+#Upload to the Postgres database.
+success = db.upload_to_db(cleanAPIdata,"dim_store_details")
+
