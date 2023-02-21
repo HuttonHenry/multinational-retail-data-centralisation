@@ -42,3 +42,14 @@ class DataCleaning:
                 df.fillna(value='', inplace=True)
                 # here we return the dataframe and do not return any null fields
                 return df.dropna(how='any')
+     
+        def clean_orders_data(self, data):
+            # Remove unnecessary columns
+            data = data.drop(columns=["first_name", "last_name", "1"])
+            
+            # Rename columns to remove spaces and make them lowercase
+            data = data.rename(columns=lambda x: x.strip().lower().replace(" ", "_"))
+            for col in data.columns:
+                print(col)
+            
+            return data

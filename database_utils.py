@@ -39,8 +39,12 @@ class DatabaseConnector:
 
     def list_db_tables(self,dbengine):
         inspector = inspect(dbengine)
+        tables = []
         for table_name in inspector.get_table_names():
             print(table_name)
+            tables.append(table_name)
+        return tables
+
         
     def read_data_from_db(self, table_name):
         connection = self.engine.connect()
@@ -109,3 +113,30 @@ cleanAPIdata = dc.DataCleaning().clean_store_data(APIdf)
 #Upload to the Postgres database.
 success = db.upload_to_db(cleanAPIdata,"dim_store_details")
 
+# List all tables in the database
+tables = db.list_db_tables(engine)
+
+# Find the table containing all information about the product orders
+orders_table_name = None
+
+for table in tables:
+    if "orders" in table:
+        orders_table_name = table
+        break
+
+if orders_table_name is None:
+    raise Exception("Could not find the orders table in the database")
+else:
+    print(f"Orders table is called: {orders_table_name}")
+
+# Extract the orders data from the database and store it in a DataFrame
+engine = db.init_db_engine()
+orders_data = db.read_data_from_db(orders_table_name)
+print("cleaning orders data!")
+print(type(orders_data))
+cleaned_orders_data  = dc.DataCleaning().clean_orders_data(orders_data)
+print("Uploading data to local SQL database")
+# Upload the cleaned data to the database
+cleaned_orders_data = cleaned_orders_data.reset_index(drop=True)
+cleaned_orders_data = cleaned_orders_data.rename(columns={"level_0": "dude"})
+success = db.upload_to_db(cleaned_orders_data, "orders_table")

@@ -1,6 +1,8 @@
 import tabula 
 import pandas as pd
 import requests 
+import boto3
+
 
 class DataExtractor:
 
