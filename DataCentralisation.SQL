@@ -104,19 +104,27 @@ DELETE FROM dim_users
 WHERE date_of_birth ~ '[a-zA-Z]';
 
 And then we ran the alter statements
+ 
 
-alter table dim_users
-	alter column first_name set data type VARCHAR(255),
-	alter column last_name set data type VARCHAR(255),
-	alter column date_of_birth set data type DATE using to_date(date_of_birth,'yyyy-mm-dd'),
-	alter column country_code set data type VARCHAR(10),
-	alter column user_uuid set data type UUID using user_uuid::uuid,
-	alter column join_date set data type DATE using to_date(join_date,'yyyy-mm-dd');
+Task 3.3
+We added a column for the latitude merge
 
-    
+ALTER TABLE dim_store_details ADD COLUMN latitude_new text;
 
+Then we merged the data into the database.
+UPDATE dim_store_details SET latitude_new = CONCAT(lat, ' ', latitude);
 
+Then I had to get rid of NULL records
+But the NULL wasn't working so I deleted two manually
 
+delete FROM dim_store_details WHERE level_0=405;
+delete FROM dim_store_details WHERE latitude='N/A';
+delete FROM dim_store_details WHERE longitude='N/A';
+
+Then deleted records where there was alpha chars in the wrong fields
+DELETE
+FROM dim_store_details
+WHERE staff_numbers !~ '^\d+$';
 
 
 

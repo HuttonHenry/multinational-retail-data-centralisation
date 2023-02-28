@@ -1,0 +1,1 @@
+UPDATE dim_store_details SET latitude_new = CONCAT(lat, ' ', latitude);
