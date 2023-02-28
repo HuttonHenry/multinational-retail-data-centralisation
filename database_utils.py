@@ -140,3 +140,8 @@ print("Uploading data to local SQL database")
 cleaned_orders_data = cleaned_orders_data.reset_index(drop=True)
 cleaned_orders_data = cleaned_orders_data.rename(columns={"level_0": "dude"})
 success = db.upload_to_db(cleaned_orders_data, "orders_table")
+
+#collect JSON data from S3
+print(f"Now copying json data from S3 and copying to local database.")
+json_data=de.DataExtractor().retreive_sales_date_times("data-handling-public","date_details.json")
+success = db.upload_to_db(json_data, "dim_date_times")

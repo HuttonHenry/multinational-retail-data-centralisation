@@ -2,6 +2,7 @@ import tabula
 import pandas as pd
 import requests 
 import boto3
+import io
 
 
 class DataExtractor:
@@ -39,3 +40,15 @@ class DataExtractor:
                 print(f"Collected record {i}")
             df = pd.DataFrame(stores_data)
         return df
+    
+    def retreive_sales_date_times(self,S3bucket,S3File):
+        # Connect to the S3 bucket and read the JSON file
+        s3 = boto3.resource("s3")
+        bucket = s3.Bucket(S3bucket)
+        json_obj = bucket.Object(S3File).get()["Body"].read()
+
+        # Convert the bytes object to a file-like object
+        json_file = io.BytesIO(json_obj)
+        # Convert the JSON data to a pandas DataFrame
+        json_data = pd.read_json(json_file)
+        return json_data
