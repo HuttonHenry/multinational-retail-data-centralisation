@@ -52,3 +52,10 @@ class DataExtractor:
         # Convert the JSON data to a pandas DataFrame
         json_data = pd.read_json(json_file)
         return json_data
+    
+    #Milestone 2.6
+    def extract_from_s3(s3_address):
+        s3 = boto3.client('s3')
+        obj = s3.get_object(Bucket='data-handling-public', Key='products.csv')
+        data = pd.read_csv(obj['Body'])
+        return data

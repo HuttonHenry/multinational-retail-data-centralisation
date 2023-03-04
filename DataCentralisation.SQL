@@ -127,5 +127,34 @@ FROM dim_store_details
 WHERE staff_numbers !~ '^\d+$';
 
 
+Milestone 3.4:
+UPDATE dim_products
+SET product_price = REPLACE(product_price, '£', '')
 
+Milestone 3.5
+Now we change the data type for all fields as they have been cleaned.
 
+ALTER TABLE dim_products
+ALTER COLUMN product_price TYPE FLOAT USING product_price::FLOAT
+
+ALTER TABLE dim_products
+ALTER COLUMN weight TYPE FLOAT USING weight::FLOAT
+
+ALTER COLUMN EAN TYPE VARCHAR(255)
+
+Before changing still_availble to boolean I had to change the underlying data:
+
+UPDATE dim_products
+SET still_available = 
+  CASE
+    WHEN still_available = 'Still_available' THEN '1'
+    WHEN still_available = 'Removed' THEN 0
+	ELSE '1'
+  END;
+
+  And then:
+
+  ALTER TABLE dim_products
+ALTER COLUMN still_available TYPE BOOL USING still_available::boolean
+
+I used the GUI to change some fields as this was quicker.  No need to recreate this environent going forwards.

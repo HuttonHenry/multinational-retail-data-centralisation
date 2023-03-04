@@ -53,3 +53,32 @@ class DataCleaning:
                 print(col)
             
             return data
+        
+        def convert_product_weights(df):
+            # create a dictionary to map units to kg
+            unit_dict = {
+                "g": 0.001,
+                "kg": 1.0,
+                "ml": 0.001,
+                "l": 1.0
+            }
+            
+            # clean up the weight column and remove excess characters
+            #df["weight"] = df["weight"].str.replace(",", ".").str.extract('(\d+\.?\d*)')[0].astype(float)
+            
+            # replace units with kg equivalent
+            df.dropna()
+            df["unit"] = df["weight"].str.extract('([a-zA-Z]+)')[0].str.lower()
+            df["weight"] = df["weight"].str.extract('(\d+)')
+            df["weight"] = pd.to_numeric(df["weight"])
+            df["weight"] = df["weight"] * df["unit"].map(unit_dict)
+            df.drop("unit", axis=1, inplace=True)
+            
+            return df
+        
+        def clean_products_data(df):
+            print(df.info()) 
+            df = df.dropna() # Drop any rows with missing values
+            df = df.drop_duplicates() # Drop any duplicate rows
+            df = df[df['weight'] > 0] # Drop any rows with weight <= 0
+            return df.reset_index(drop=True)

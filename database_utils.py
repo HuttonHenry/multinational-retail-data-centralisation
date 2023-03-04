@@ -145,3 +145,15 @@ success = db.upload_to_db(cleaned_orders_data, "orders_table")
 print(f"Now copying json data from S3 and copying to local database.")
 json_data=de.DataExtractor().retreive_sales_date_times("data-handling-public","date_details.json")
 success = db.upload_to_db(json_data, "dim_date_times")
+
+#So I missed the entire milestone, 2.6 - collect CSV data, convert the weigths and clean the data before uploading to the database.
+
+# First extract the data from S3
+products_data = de.DataExtractor.extract_from_s3('s3://data-handling-public/products.csv')
+
+# Then clean the data
+cleaned_data = dc.DataCleaning.convert_product_weights(products_data)
+cleaned_data = dc.DataCleaning.clean_products_data(cleaned_data)
+
+# Finally upload the data to the database
+success = db.upload_to_db(cleaned_data, "dim_products")
