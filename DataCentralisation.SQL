@@ -157,4 +157,4 @@ SET still_available =
   ALTER TABLE dim_products
 ALTER COLUMN still_available TYPE BOOL USING still_available::boolean
 
-I used the GUI to change some fields as this was quicker.  No need to recreate this environent going forwards.
+I used the GUI to change some fields as this was quicker.  No need to recreate this environent going forwards..6 
