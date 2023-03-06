@@ -158,3 +158,190 @@ SET still_available =
 ALTER COLUMN still_available TYPE BOOL USING still_available::boolean
 
 I used the GUI to change some fields as this was quicker.  No need to recreate this environent going forwards..6 
+
+Milestone 3.6
+
+Clean it all up using SQL
+
+1. remove NULL records
+
+delete from dim_date_times where month='NULL'
+
+2. remove non numeric records
+First we find all those records:
+SELECT * FROM dim_date_times
+WHERE month SIMILAR TO '%[^0-9]%';
+
+Then we delete them!
+
+DELETE FROM dim_date_times
+WHERE month SIMILAR TO '%[^0-9]%';
+
+After all the rubbish has gone, lets change the table:
+
+alter table dim_date_times
+	ALTER COLUMN date_uuid TYPE uuid using CAST(date_uuid AS uuid);
+	alter column time_period type varchar(12)
+	alter column day type char(4)
+	alter column year type char(4)
+	alter column month type char(2)
+
+Milestone 3.7 updating the card details table
+
+alter table dim_card_details
+	ALTER COLUMN date_payment_confirmed type date USING date_payment_confirmed::date
+	ALTER COLUMN expiry_date type varchar(5)
+	ALTER COLUMN card_number type varchar(16)
+
+I realised I had re-run the code numerous times so all the datatables had 6 duplicate entries for all records.
+
+So I had to find the duplciates
+
+SELECT card_number, COUNT(*)
+FROM dim_card_details
+GROUP BY card_number
+HAVING COUNT(*) > 1;
+
+Then delete them
+
+DELETE FROM dim_card_details
+WHERE ctid NOT IN (
+    SELECT MIN(ctid)
+    FROM dim_card_details
+    GROUP BY card_number
+);
+
+
+SAME AGAIN for the date and times table:
+
+SELECT date_uuid, COUNT(*)
+FROM dim_date_times
+GROUP BY date_uuid
+HAVING COUNT(*) > 1;
+
+DELETE FROM dim_date_times
+WHERE ctid NOT IN (
+    SELECT MIN(ctid)
+    FROM dim_date_times
+    GROUP BY date_uuid
+);
+
+select * from dim_date_times order by date_uuid
+
+AGAIN - FOR PRODUCT CODE
+
+select * from dim_products order by product_code
+
+SELECT product_code, COUNT(*)
+FROM dim_products
+GROUP BY product_code
+HAVING COUNT(*) > 1;
+
+DELETE FROM dim_products
+WHERE ctid NOT IN (
+    SELECT MIN(ctid)
+    FROM dim_products
+    GROUP BY product_code
+);
+
+select * from dim_products order by product_code
+
+SAME AGAIN for Store Details
+select * from dim_store_details order by store_code
+
+SELECT store_code, COUNT(*)
+FROM dim_store_details
+GROUP BY store_code
+HAVING COUNT(*) > 1;
+
+DELETE FROM dim_store_details
+WHERE ctid NOT IN (
+    SELECT MIN(ctid)
+    FROM dim_store_details
+    GROUP BY store_code
+);
+
+select * from dim_store_details order by store_code
+
+
+SAME AGAIN for Users Table:
+
+select * from dim_users order by user_uuid
+
+SELECT user_uuid, COUNT(*)
+FROM dim_users
+GROUP BY user_uuid
+HAVING COUNT(*) > 1;
+
+DELETE FROM dim_users
+WHERE ctid NOT IN (
+    SELECT MIN(ctid)
+    FROM dim_users
+    GROUP BY user_uuid
+);
+
+select * from dim_users order by user_uuid
+
+
+
+Then we add all the Primary Keys:
+
+select * from dim_card_details order by card_number
+
+Alter table dim_card_details
+ADD CONSTRAINT pk_card_number
+PRIMARY KEY (card_number)
+
+select * from dim_date_times
+
+Alter table dim_date_times
+ADD CONSTRAINT pk_date_uuid
+PRIMARY KEY (date_uuid)
+
+Alter table  dim_store_details
+ADD CONSTRAINT pk_store_code
+PRIMARY KEY (store_code)
+
+
+
+select * from dim_users
+
+Alter table  dim_users
+ADD CONSTRAINT pk_user_uuid
+PRIMARY KEY (user_uuid);
+
+Alter table  dim_products
+ADD CONSTRAINT pk_product_code
+PRIMARY KEY (product_code)
+
+
+MILESTONE 4: Querying the data!
+
+MS4.1 query using Group By
+
+SELECT dim_store_details.country_code, COUNT(*) AS store_count
+FROM dim_store_details
+GROUP BY dim_store_details.country_code
+ORDER BY store_count DESC;
+
+Presents the following:
+
+
+MS4.2 find the locations with the most stores:
+
+SELECT dim_store_details.locality, COUNT(*) AS locality_count
+FROM dim_store_details
+GROUP BY dim_store_details.locality
+ORDER BY locality_count DESC;
+
+MS4. 3 Which months produce the most sales typically?
+
+SELECT dim_date_times.month, COUNT(*) as total_sales
+FROM dim_date_times
+JOIN orders_table ON dim_date_times.date_uuid = orders_table.date_uuid
+GROUP BY dim_date_times.month
+ORDER BY dim_date_times.month;
+
+The issue here is I have the nummber of orders but I need to also find out the price of each item.
+
+

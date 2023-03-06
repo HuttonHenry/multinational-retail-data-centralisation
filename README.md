@@ -99,3 +99,20 @@ SET weight_class =
   END;
 
   
+MS 3.6
+
+Now update the date table with the correct types:
+
++-----------------+-------------------+--------------------+
+| dim_date_times  | current data type | required data type |
++-----------------+-------------------+--------------------+
+| month           | TEXT              | CHAR(?)            |
+| year            | TEXT              | CHAR(?)            |
+| day             | TEXT              | CHAR(?)            |
+| time_period     | TEXT              | VARCHAR(?)         |
+| date_uuid       | TEXT              | UUID               |
++-----------------+-------------------+--------------------+
+
+Obviously the data is pretty dirty, with NULLS and non numerics.
+
+
